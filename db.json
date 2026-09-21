@@ -1,0 +1,46 @@
+{
+  "patients": [
+    {
+      "id": "1",
+      "name": "John Doe",
+      "age": 30,
+      "gender": "Male",
+      "symptoms": "Fever, Cough",
+      "priority": 2
+    },
+    {
+      "id": "2",
+      "name": "Jane Smith",
+      "age": 25,
+      "gender": "Female",
+      "symptoms": "Headache, Nausea",
+      "priority": 3
+    },
+    {
+      "id": "3",
+      "name": "Alice Johnson",
+      "age": 40,
+      "gender": "Female",
+      "symptoms": "Chest Pain",
+      "priority": 1
+    },
+    {
+      "name": "FARIDAH",
+      "age": 22,
+      "gender": "Female",
+      "phone": "08099777655",
+      "address": "",
+      "department": "General Medicine",
+      "reason": "CHECKUP",
+      "symptoms": "COUGH AND STOOLING",
+      "duration": "12 days",
+      "medicalConditions": "NONE",
+      "allergies": "NONE",
+      "emergencyContact": "090530976",
+      "queueNumber": "A817",
+      "status": "Waiting",
+      "id": "XsGIVFaCLvU"
+    }
+  ],
+  "$schema": "./node_modules/json-server/schema.json"
+}
