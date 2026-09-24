@@ -1,53 +1,53 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc,
+} from "firebase/firestore";
 
-export async function getPatients() {
-  const response = await fetch(`${API_URL}/patients`);
+import { db } from "../firebase";
 
-  if (!response.ok) {
-    throw new Error("Failed to load patients");
-  }
+const patientsCollection = collection(db, "patients");
 
-  return response.json();
-}
+// Get all patients
+export const getPatients = async () => {
+  const snapshot = await getDocs(patientsCollection);
 
-export async function addPatient(patient) {
-  const response = await fetch(`${API_URL}/patients`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(patient),
-  });
+  return snapshot.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+};
 
-  if (!response.ok) {
-    throw new Error("Failed to register patient");
-  }
+// Add a patient
+export const addPatient = async (patient) => {
+  const docRef = await addDoc(patientsCollection, patient);
 
-  return response.json();
-}
+  return {
+    id: docRef.id,
+    ...patient,
+  };
+};
 
-export async function updatePatient(id, updates) {
-  const response = await fetch(`${API_URL}/patients/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updates),
-  });
+// Update a patient
+export const updatePatient = async (id, updates) => {
+  const patientRef = doc(db, "patients", id);
 
-  if (!response.ok) {
-    throw new Error("Failed to update patient");
-  }
+  await updateDoc(patientRef, updates);
 
-  return response.json();
-}
+  return {
+    id,
+    ...updates,
+  };
+};
 
-export async function deletePatient(id) {
-  const response = await fetch(`${API_URL}/patients/${id}`, {
-    method: "DELETE",
-  });
+// Delete a patient
+export const deletePatient = async (id) => {
+  const patientRef = doc(db, "patients", id);
 
-  if (!response.ok) {
-    throw new Error("Failed to delete patient");
-  }
-}
+  await deleteDoc(patientRef);
+
+  return id;
+};

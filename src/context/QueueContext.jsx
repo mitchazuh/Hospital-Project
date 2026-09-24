@@ -1,3 +1,4 @@
+```javascript
 import {
   createContext,
   useContext,
@@ -6,7 +7,13 @@ import {
 } from "react";
 
 import {
-  getPatients,
+  collection,
+  onSnapshot,
+} from "firebase/firestore";
+
+import { db } from "../firebase";
+
+import {
   addPatient as addPatientToApi,
   updatePatient,
   deletePatient,
@@ -18,31 +25,34 @@ export function QueueProvider({ children }) {
   const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Load patients from API
+  // Listen to Firebase in real time
   useEffect(() => {
-    const loadPatients = async () => {
-      try {
-        const data = await getPatients();
-        setPatients(data);
-      } catch (error) {
+    const patientsCollection = collection(db, "patients");
+
+    const unsubscribe = onSnapshot(
+      patientsCollection,
+      (snapshot) => {
+        const patientsData = snapshot.docs.map((document) => ({
+          id: document.id,
+          ...document.data(),
+        }));
+
+        setPatients(patientsData);
+        setLoading(false);
+      },
+      (error) => {
         console.error("Error loading patients:", error);
-      } finally {
         setLoading(false);
       }
-    };
+    );
 
-    loadPatients();
+    return () => unsubscribe();
   }, []);
 
   // Register patient
   const addPatient = async (newPatient) => {
     try {
       const savedPatient = await addPatientToApi(newPatient);
-
-      setPatients((currentPatients) => [
-        ...currentPatients,
-        savedPatient,
-      ]);
 
       return savedPatient;
     } catch (error) {
@@ -58,14 +68,6 @@ export function QueueProvider({ children }) {
         status,
       });
 
-      setPatients((currentPatients) =>
-        currentPatients.map((patient) =>
-          String(patient.id) === String(id)
-            ? updatedPatient
-            : patient
-        )
-      );
-
       return updatedPatient;
     } catch (error) {
       console.error("Error updating patient:", error);
@@ -77,12 +79,6 @@ export function QueueProvider({ children }) {
   const removePatient = async (id) => {
     try {
       await deletePatient(id);
-
-      setPatients((currentPatients) =>
-        currentPatients.filter(
-          (patient) => String(patient.id) !== String(id)
-        )
-      );
     } catch (error) {
       console.error("Error deleting patient:", error);
       throw error;
@@ -97,8 +93,6 @@ export function QueueProvider({ children }) {
           deletePatient(patient.id)
         )
       );
-
-      setPatients([]);
     } catch (error) {
       console.error("Error clearing queue:", error);
       throw error;
@@ -124,3 +118,4 @@ export function QueueProvider({ children }) {
 export function useQueue() {
   return useContext(QueueContext);
 }
+```
