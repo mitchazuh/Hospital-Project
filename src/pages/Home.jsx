@@ -141,7 +141,7 @@ function Home() {
 
             <p>
               Improved efficiency and
-              shorter waiting times.
+              shorter wait times.
             </p>
           </div>
 
